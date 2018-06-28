@@ -1,0 +1,44 @@
+<html>
+
+<head>
+  <script type="text/javascript" src='http://code.jquery.com/jquery-1.10.2.min.js'></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css">
+  <script src=" https://code.jquery.com/jquery-3.2.1.slim.min.js "></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js ">
+  </script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js">
+  </script>
+  <title>Email Validation</title>
+</head>
+
+<body>
+  <div class="form-group container">
+
+    {% if valid == True%}
+    <h5> The Email addresses you entered: {{email}} is valid </h5> {% for emails in all_emails: %}
+
+    <ul>
+      <li>Email {{ emails['email'] }}, : {{ emails['created_at'] }}</li>
+    </ul>
+
+    {% endfor %} {% endif %} {% if valid == False %}
+    <h5> The email address {{email}}</h5> {% endif %} {% with messages = get_flashed_messages() %} {% if messages %}
+    <ul class=flashes>
+      {% for message in messages %}
+      <br>
+      <h5>{{ message }} {{email}} </h5> {% endfor %}
+    </ul>
+    {% endif %} {% endwith %} {% block body %}{% endblock %}
+  </div>
+  <hr>
+
+  <div class="form-group container">
+
+    <form action='/success' method='POST'>
+      <label for="email">Email Address:<input type="text" name="email" id="email"></label>
+      <input type="submit" value="Submit">
+    </form>
+  </div>
+</body>
+
+</html>
