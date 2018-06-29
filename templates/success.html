@@ -1,32 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="stylesheet" type="text/css" 
-   href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css">
-  <link rel="stylesheet" type="text/css" 
-   href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.min.css">
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <title>{{title}}</title>
 </head>
+
 <body>
   <div class="container">
-    <h1>Enter your email address!</h1>
+    This is the success page
+    <a href="/">back</a>
     {% with messages = get_flashed_messages() %}
       {% if messages %}
-        <ul class="errors">
+        <ul class="success">
           {% for message in messages %}
-            {{ message }}
+            <li>{{ message }}</li>
           {% endfor %}
         </ul>
       {% endif %}
     {% endwith %}
-    <form action="/create" method="post">
-      <input type="text" name="email" placeholder="someaddress@email.com">
-      <input type="submit" value="Add Email">
-    </form>
+    {% if emails %}
+      <ul>
+        {% for email in emails %}
+          <li>{{ emails.emails }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
   </div>
 </body>
+
 </html>

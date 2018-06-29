@@ -1,50 +1,48 @@
-from flask import Flask, request, redirect, render_template, session, flash
-import re
+from flask import Flask, render_template, redirect, request, session, flash
 from mysqlconnection import MySQLConnector
+import re
+EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9\.\+_-]+@[a-zA-Z0-9\._-]+\.[a-zA-Z]*$')
 app = Flask(__name__)
-EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
+app.secret_key = "keepitsecretkeepitsafe"
 
 mysql = MySQLConnector(app, 'email_validation_with_db')
-app.secret_key = "ThisIsSecret!"
-
-
-print("***************** Emails *******************")
-print mysql.query_db("select * from emails")
-
 
 @app.route('/')
 def index():
-    query = "select * from emails"
-    emails = mysql.query_db(query)
-    print emails
-    return render_template('index.html', all_emails=emails)
+  return render_template('index.html', title="Email Home")
 
-@app.route('/emails', methods=['POST'])
+@app.route('/create', methods=["POST"])
 def create():
-    query = "insert into emails (email, created_at, updated_at) values (:email, now(), now())"
+  errors = False
+  if not EMAIL_REGEX.match(request.form['email']):
+    errors = True
+    flash("Must be a valid email address")
+  query = "SELECT * FROM emails WHERE email = :email"
+  data = {
+    "email": request.form['email']
+  }
+  emails = mysql.query_db(query, data)
+  print emails
+  if len(emails) > 0:
+    errors = True
+    flash("Email address already added")
+
+  if errors:
+    return redirect('/')
+  else:
+    query = "INSERT INTO emails (email, created_at, updated_at) VALUES (:email, NOW(), NOW())"
     data = {
-        'email': request.form['email']
+      "email": request.form['email']
     }
     mysql.query_db(query, data)
-    return redirect('/')
 
-@app.route('/success', methods=['POST'])
+    flash("The email address you entered is a valid email address")
+    return redirect('/success')
+
+@app.route('/success')
 def success():
-    query = "select * from emails where email = :email"
-    query2 = "select * from emails"
-    email =  request.form['email']
-    data = {
-             'email': request.form['email']
-           }
-    value = mysql.query_db(query, data)
-
-    if len(value)==0:
-        valid = False
-        flash('the email you entered was invalid')
-        return redirect('/')
-    else: valid = True
-    value = mysql.query_db(query2, data)
-
-    return render_template('index.html', valid=valid, all_emails=value, email = email)
+  emails_query = "SELECT * FROM emails"
+  emails = mysql.query_db(emails_query)
+  return render_template('success.html', title="Email Success", emails=emails)
 
 app.run(debug=True)
